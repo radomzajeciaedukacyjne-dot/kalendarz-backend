@@ -25,16 +25,18 @@ app.get("/", (req, res) => {
 
 // 🔥 WYSYŁKA REZERWACJI
 app.post("/rezerwacja", async (req, res) => {
-console.log("DOSTAŁEM REQUEST:", req.body);
+  console.log("DOSTAŁEM REQUEST:", req.body);
+
   const { name, surname, email, phone, facility, date, time } = req.body;
 
   try {
-    // 📩 MAIL DO ADMINA
-await transporter.sendMail({
-  from: `"Kalendarz" <radom.zajecia.edukacyjne@gmail.com>`,
-  to: "radom.zajecia.edukacyjne@gmail.com",
-  subject: "Nowa rezerwacja",
-  text: `
+    console.log("➡️ Wysyłam mail do admina...");
+
+    await transporter.sendMail({
+      from: `"Kalendarz" <radom.zajecia.edukacyjne@gmail.com>`,
+      to: "radom.zajecia.edukacyjne@gmail.com",
+      subject: "Nowa rezerwacja",
+      text: `
 Nowa rezerwacja:
 
 Data: ${date}
@@ -45,34 +47,30 @@ Nazwisko: ${surname}
 Email: ${email}
 Telefon: ${phone}
 Placówka: ${facility}
-  `
-});
+      `
+    });
 
-// 📩 MAIL DO UŻYTKOWNIKA
-await transporter.sendMail({
-  from: `"Nadleśnictwo Radom" <radom.zajecia.edukacyjne@gmail.com>`,
-  to: email,
-  subject: "Potwierdzenie rezerwacji",
-  text: `
+    console.log("✅ Mail do admina wysłany");
+
+    console.log("➡️ Wysyłam mail do użytkownika...");
+
+    await transporter.sendMail({
+      from: `"Nadleśnictwo Radom" <radom.zajecia.edukacyjne@gmail.com>`,
+      to: email,
+      subject: "Potwierdzenie rezerwacji",
+      text: `
 Dzień dobry ${name},
 
-Twoja rezerwacja została zapisana ✅
+Twoja rezerwacja została zapisana
+      `
+    });
 
-📅 Data: ${date}
-🕒 Godzina: ${time}
-
-Placówka: ${facility}
-
-W razie pytań prosimy o kontakt.
-
-Pozdrawiamy,
-Nadleśnictwo Radom
-  `
-});
+    console.log("✅ Mail do użytkownika wysłany");
 
     res.json({ success: true });
+
   } catch (err) {
-    console.error(err);
+    console.error("❌ BŁĄD MAILA:", err);
     res.status(500).json({ error: "Błąd wysyłki maila" });
   }
 });
