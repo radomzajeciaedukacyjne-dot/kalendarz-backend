@@ -9,7 +9,9 @@ app.use(express.json());
 
 // 🔥 KONFIGURACJA MAILA (TU PODASZ SWÓJ EMAIL)
 const transporter = nodemailer.createTransport({
-  service: "gmail",
+  host: "smtp.gmail.com",
+  port: 465,
+  secure: true,
   auth: {
     user: "radom.zajecia.edukacyjne@gmail.com",
     pass: process.env.EMAIL_PASS
