@@ -48,19 +48,19 @@ Placówka: ${facility}
 
     console.log("➡️ Wysyłam mail do użytkownika...");
 // await resend.emails.send({
- // from: "onboarding@resend.dev",
- // to: email,
- // subject: "Potwierdzenie rezerwacji",
- // text: `
+//   from: "onboarding@resend.dev",
+//   to: email,
+//   subject: "Potwierdzenie rezerwacji",
+//   text: `
 // Dzień dobry ${name},
-
+//
 // Twoja rezerwacja została zapisana ✅
-
+//
 // 📅 Data: ${date}
 // 🕒 Godzina: ${time}
-
+//
 // Placówka: ${facility}
-  `
+//   `
 // });
 
    
