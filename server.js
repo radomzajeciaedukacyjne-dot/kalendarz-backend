@@ -23,6 +23,7 @@ app.get("/", (req, res) => {
 
 // 🔥 WYSYŁKA REZERWACJI
 app.post("/rezerwacja", async (req, res) => {
+console.log("DOSTAŁEM REQUEST:", req.body);
   const { name, surname, email, phone, facility, date, time } = req.body;
 
   try {
