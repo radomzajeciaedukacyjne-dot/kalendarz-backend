@@ -1,25 +1,15 @@
 const express = require("express");
 const cors = require("cors");
-const nodemailer = require("nodemailer");
+const { Resend } = require("resend");
+
 
 const app = express();
 
 app.use(cors());
 app.use(express.json());
+const resend = new Resend(process.env.RESEND_API_KEY);
 
-// 🔥 KONFIGURACJA MAILA (TU PODASZ SWÓJ EMAIL)
-const transporter = nodemailer.createTransport({
-  host: "smtp.gmail.com",
-  port: 587,
-  secure: false,
-  tls: {
-    rejectUnauthorized: false
-  },
-  auth: {
-    user: "radom.zajecia.edukacyjne@gmail.com",
-    pass: process.env.EMAIL_PASS
-  }
-});
+
 
 // 🔥 TEST
 app.get("/", (req, res) => {
@@ -34,12 +24,11 @@ app.post("/rezerwacja", async (req, res) => {
 
   try {
     console.log("➡️ Wysyłam mail do admina...");
-
-    await transporter.sendMail({
-      from: `"Kalendarz" <radom.zajecia.edukacyjne@gmail.com>`,
-      to: "radom.zajecia.edukacyjne@gmail.com",
-      subject: "Nowa rezerwacja",
-      text: `
+await resend.emails.send({
+  from: "onboarding@resend.dev",
+  to: "radom.zajecia.edukacyjne@gmail.com",
+  subject: "Nowa rezerwacja",
+  text: `
 Nowa rezerwacja:
 
 Data: ${date}
@@ -50,23 +39,31 @@ Nazwisko: ${surname}
 Email: ${email}
 Telefon: ${phone}
 Placówka: ${facility}
-      `
-    });
+  `
+});
+
+   
 
     console.log("✅ Mail do admina wysłany");
 
     console.log("➡️ Wysyłam mail do użytkownika...");
-
-    await transporter.sendMail({
-      from: `"Nadleśnictwo Radom" <radom.zajecia.edukacyjne@gmail.com>`,
-      to: email,
-      subject: "Potwierdzenie rezerwacji",
-      text: `
+await resend.emails.send({
+  from: "onboarding@resend.dev",
+  to: email,
+  subject: "Potwierdzenie rezerwacji",
+  text: `
 Dzień dobry ${name},
 
-Twoja rezerwacja została zapisana
-      `
-    });
+Twoja rezerwacja została zapisana ✅
+
+📅 Data: ${date}
+🕒 Godzina: ${time}
+
+Placówka: ${facility}
+  `
+});
+
+   
 
     console.log("✅ Mail do użytkownika wysłany");
 
