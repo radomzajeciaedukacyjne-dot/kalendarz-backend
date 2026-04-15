@@ -26,7 +26,7 @@ app.post("/rezerwacja", async (req, res) => {
     console.log("➡️ Wysyłam mail do admina...");
 await resend.emails.send({
   from: "Rezerwacje <onboarding@resend.dev>",
-  to: "rafal-leszczynski2@wp.pl",
+  to: "radom.zajecia.edukacyjne@gmail.com",
   subject: "Nowa rezerwacja",
   text: `
 Nowa rezerwacja:
