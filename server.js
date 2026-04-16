@@ -2,48 +2,66 @@ const express = require("express");
 const cors = require("cors");
 const { Resend } = require("resend");
 
-
 const app = express();
 
 app.use(cors());
 app.use(express.json());
+
 const resend = new Resend(process.env.RESEND_API_KEY);
-let reservations = [];
 
+// 🔥 SUPABASE
+const SUPABASE_URL = "https://atzejpcxfvjxekfbrvbc.supabase.co";
+const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImF0emVqcGN4ZnZqeGVrZmJydmJjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzYyOTQwMzgsImV4cCI6MjA5MTg3MDAzOH0.dXA26WQgRcpt0Y-yGYohdikDPdFGgXjgYPb7_wCukCg";
 
-
-// 🔥 TEST
-app.get("/", (req, res) => {
-  res.send("Serwer działa!");
-});
 // 🔥 POBIERANIE REZERWACJI
-app.get("/rezerwacje", (req, res) => {
-  res.json(reservations);
+app.get("/rezerwacje", async (req, res) => {
+  try {
+    const response = await fetch(`${SUPABASE_URL}/rest/v1/reservations`, {
+      headers: {
+        apikey: SUPABASE_KEY,
+        Authorization: `Bearer ${SUPABASE_KEY}`
+      }
+    });
+
+    const data = await response.json();
+    res.json(data);
+
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Błąd pobierania" });
+  }
 });
 
-// 🔥 WYSYŁKA REZERWACJI
+// 🔥 DODAWANIE REZERWACJI
 app.post("/rezerwacja", async (req, res) => {
-  console.log("DOSTAŁEM REQUEST:", req.body);
-
   const { name, surname, email, phone, facility, date, time } = req.body;
-// 🔥 ZAPIS DO PAMIĘCI
-reservations.push({
-  name,
-  surname,
-  email,
-  phone,
-  facility,
-  date,
-  time
-});
 
   try {
-    console.log("➡️ Wysyłam mail do admina...");
-const result = await resend.emails.send({
-  from: "Rezerwacje <kontakt@rezerwacje-radom.pl>",
-  to: "radom.zajecia.edukacyjne@gmail.com",
-  subject: "Nowa rezerwacja",
-  text: `
+    // 🔥 zapis do SUPABASE
+    await fetch(`${SUPABASE_URL}/rest/v1/reservations`, {
+      method: "POST",
+      headers: {
+        apikey: SUPABASE_KEY,
+        Authorization: `Bearer ${SUPABASE_KEY}`,
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify([{
+        name,
+        surname,
+        email,
+        phone,
+        facility,
+        date,
+        time
+      }])
+    });
+
+    // 🔥 MAIL ADMIN
+    await resend.emails.send({
+      from: "Rezerwacje <kontakt@rezerwacje-radom.pl>",
+      to: "radom.zajecia.edukacyjne@gmail.com",
+      subject: "Nowa rezerwacja",
+      text: `
 Nowa rezerwacja:
 
 Data: ${date}
@@ -54,22 +72,15 @@ Nazwisko: ${surname}
 Email: ${email}
 Telefon: ${phone}
 Placówka: ${facility}
-  `
-});
+`
+    });
 
-console.log("RESEND RESULT:", result);
-console.log("✅ Mail do admina wysłany");
-
-   
-
-    console.log("✅ Mail do admina wysłany");
-
-    console.log("➡️ Wysyłam mail do użytkownika...");
-await resend.emails.send({
-  from: "Rezerwacje <kontakt@rezerwacje-radom.pl>",
-  to: email,
-  subject: "Potwierdzenie rezerwacji",
-  text: `
+    // 🔥 MAIL USER
+    await resend.emails.send({
+      from: "Rezerwacje <kontakt@rezerwacje-radom.pl>",
+      to: email,
+      subject: "Potwierdzenie rezerwacji",
+      text: `
 Dzień dobry ${name},
 
 Twoja rezerwacja została zapisana ✅
@@ -81,22 +92,18 @@ Placówka: ${facility}
 
 Pozdrawiamy,
 Nadleśnictwo Radom
-  `
-});
-
-   
-
-    console.log("✅ Mail do użytkownika wysłany");
+`
+    });
 
     res.json({ success: true });
 
   } catch (err) {
-    console.error("❌ BŁĄD MAILA:", err);
-    res.status(500).json({ error: "Błąd wysyłki maila" });
+    console.error(err);
+    res.status(500).json({ error: "Błąd" });
   }
 });
 
-// 🔥 START SERWERA
+// 🔥 START
 const PORT = process.env.PORT || 3000;
 
 app.listen(PORT, () => {
