@@ -8,6 +8,7 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 const resend = new Resend(process.env.RESEND_API_KEY);
+let reservations = [];
 
 
 
@@ -15,12 +16,26 @@ const resend = new Resend(process.env.RESEND_API_KEY);
 app.get("/", (req, res) => {
   res.send("Serwer działa!");
 });
+// 🔥 POBIERANIE REZERWACJI
+app.get("/rezerwacje", (req, res) => {
+  res.json(reservations);
+});
 
 // 🔥 WYSYŁKA REZERWACJI
 app.post("/rezerwacja", async (req, res) => {
   console.log("DOSTAŁEM REQUEST:", req.body);
 
   const { name, surname, email, phone, facility, date, time } = req.body;
+// 🔥 ZAPIS DO PAMIĘCI
+reservations.push({
+  name,
+  surname,
+  email,
+  phone,
+  facility,
+  date,
+  time
+});
 
   try {
     console.log("➡️ Wysyłam mail do admina...");
