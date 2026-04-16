@@ -25,7 +25,7 @@ app.post("/rezerwacja", async (req, res) => {
   try {
     console.log("➡️ Wysyłam mail do admina...");
 const result = await resend.emails.send({
-  from: "Rezerwacje <onboarding@resend.dev>",
+  from: "Rezerwacje <kontakt@rezerwacje-radom.pl>",
   to: "radom.zajecia.edukacyjne@gmail.com",
   subject: "Nowa rezerwacja",
   text: `
@@ -50,21 +50,24 @@ console.log("✅ Mail do admina wysłany");
     console.log("✅ Mail do admina wysłany");
 
     console.log("➡️ Wysyłam mail do użytkownika...");
-// await resend.emails.send({
-//   from: "onboarding@resend.dev",
-//   to: email,
-//   subject: "Potwierdzenie rezerwacji",
-//   text: `
-// Dzień dobry ${name},
-//
-// Twoja rezerwacja została zapisana ✅
-//
-// 📅 Data: ${date}
-// 🕒 Godzina: ${time}
-//
-// Placówka: ${facility}
-//   `
-// });
+await resend.emails.send({
+  from: "Rezerwacje <kontakt@rezerwacje-radom.pl>",
+  to: email,
+  subject: "Potwierdzenie rezerwacji",
+  text: `
+Dzień dobry ${name},
+
+Twoja rezerwacja została zapisana ✅
+
+📅 Data: ${date}
+🕒 Godzina: ${time}
+
+Placówka: ${facility}
+
+Pozdrawiamy,
+Nadleśnictwo Radom
+  `
+});
 
    
 
