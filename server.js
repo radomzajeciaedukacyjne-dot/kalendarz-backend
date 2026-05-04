@@ -1,3 +1,4 @@
+require("dotenv").config();
 const express = require("express");
 const cors = require("cors");
 const { Resend } = require("resend");
@@ -11,7 +12,7 @@ const resend = new Resend(process.env.RESEND_API_KEY);
 
 // 🔥 SUPABASE
 const SUPABASE_URL = "https://atzejpcxfvjxekfbrvbc.supabase.co";
-const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImF0emVqcGN4ZnZqeGVrZmJydmJjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzYyOTQwMzgsImV4cCI6MjA5MTg3MDAzOH0.dXA26WQgRcpt0Y-yGYohdikDPdFGgXjgYPb7_wCukCg";
+const SUPABASE_KEY = process.env.SUPABASE_KEY;
 
 // 🔥 POBIERANIE REZERWACJI
 app.get("/rezerwacje", async (req, res) => {
